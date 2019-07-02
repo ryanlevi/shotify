@@ -119,6 +119,7 @@ class App extends Component {
             />
           )}
         </header>
+        <footer>source: https://github.com/ryanlevi/shotify</footer>
       </div>
     );
   }
