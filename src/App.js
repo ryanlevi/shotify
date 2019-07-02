@@ -20,9 +20,11 @@ class App extends Component {
         duration_ms: 0
       },
       is_playing: "Paused",
-      progress_ms: 0
+      progress_ms: 0,
+      time_elapsed: 0
     };
     this.getCurrentlyPlaying = this.getCurrentlyPlaying.bind(this);
+    // this.postNextTrack = this.postNextTrack.bind(this);
   }
   componentDidMount() {
     // Set token
@@ -35,6 +37,18 @@ class App extends Component {
       });
       this.getCurrentlyPlaying(_token);
     }
+    this.interval = setInterval(() => {
+      console.log(this.state.time_elapsed, this.state.time_elapsed >= 6);
+      this.setState({ time_elapsed: this.state.time_elapsed + 1 });
+      if (this.state.time_elapsed % 6 == 0) {
+        console.log("yoyo");
+        this.postNextTrack(_token);
+      }
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   getCurrentlyPlaying(token) {
@@ -56,6 +70,26 @@ class App extends Component {
     });
   }
 
+  postNextTrack(token) {
+    $.ajax({
+      url: "https://api.spotify.com/v1/me/player/next",
+      type: "POST",
+      beforeSend: xhr => {
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+      }
+      // success: data => {
+      //   console.log("data", data);
+      //   this.setState({
+      //     item: data.item,
+      //     is_playing: data.is_playing,
+      //     progress_ms: data.progress_ms
+      //   });
+      // }
+    });
+    // clearInterval(this.interval);
+    this.getCurrentlyPlaying(token);
+  }
+
   render() {
     return (
       <div className="App">
@@ -75,7 +109,7 @@ class App extends Component {
             <Player
               item={this.state.item}
               is_playing={this.state.is_playing}
-              progress_ms={this.progress_ms}
+              progress_ms={this.state.progress_ms}
             />
           )}
         </header>
