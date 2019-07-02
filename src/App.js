@@ -3,7 +3,7 @@ import * as $ from "jquery";
 import { authEndpoint, clientId, redirectUri, scopes } from "./config";
 import hash from "./hash";
 import Player from "./Player";
-import logo from "./logo.svg";
+import logo from "./logo.png";
 import "./App.css";
 
 class App extends Component {
@@ -36,15 +36,16 @@ class App extends Component {
         token: _token
       });
       this.getCurrentlyPlaying(_token);
+      this.interval = setInterval(() => {
+        console.log(this.state.time_elapsed, this.state.time_elapsed >= 6);
+        this.setState({ time_elapsed: this.state.time_elapsed + 1 });
+        if (this.state.time_elapsed % 60 == 0) {
+          this.postNextTrack(_token);
+          this.sleep(300);
+          this.getCurrentlyPlaying(_token);
+        }
+      }, 1000);
     }
-    this.interval = setInterval(() => {
-      console.log(this.state.time_elapsed, this.state.time_elapsed >= 6);
-      this.setState({ time_elapsed: this.state.time_elapsed + 1 });
-      if (this.state.time_elapsed % 6 == 0) {
-        console.log("yoyo");
-        this.postNextTrack(_token);
-      }
-    }, 1000);
   }
 
   componentWillUnmount() {
@@ -87,7 +88,12 @@ class App extends Component {
       // }
     });
     // clearInterval(this.interval);
-    this.getCurrentlyPlaying(token);
+    // this.getCurrentlyPlaying(token);
+  }
+
+  sleep(millisecondsToWait) {
+    var now = new Date().getTime();
+    while (new Date().getTime() < now + millisecondsToWait) {}
   }
 
   render() {
